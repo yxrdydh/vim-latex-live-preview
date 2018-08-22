@@ -117,6 +117,7 @@ EEOOFF
         let l:root_file = b:livepreview_buf_data['tmp_src_file']
     endif
 
+
     " Hack for complex project trees: recreate the tree in tmp_dir
     " Build tree for tmp_src_file (copy of the current buffer)
     let l:tmp_src_dir = fnamemodify(b:livepreview_buf_data['tmp_src_file'], ':p:h')
@@ -183,9 +184,10 @@ EEOOFF
                 \               'TEXINPUTS=' . l:tmp_root_dir
                 \                            . ':' . b:livepreview_buf_data['root_dir']
                 \                            . ': ' .
-                \       'makeglossaries -d '. l:tmp_root_dir.' '. fnamemodify(l:root_file, ':t').
+                \       'makeglossaries -d '. l:tmp_root_dir.' '. fnamemodify(l:root_file, ':t:r').
                 \ ' && ' .
                 \       b:livepreview_buf_data['run_cmd']
+        
 
         call system(b:livepreview_buf_data['run_cmd_gls'])
     

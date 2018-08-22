@@ -175,6 +175,26 @@ EEOOFF
         return
     endif
 
+    " Enable compilation of glossary:
+       " Update compile command with glossaries
+        let b:livepreview_buf_data['run_cmd_gls'] =
+                \       'env ' .
+                \               'TEXMFOUTPUT=' . l:tmp_root_dir . ' ' .
+                \               'TEXINPUTS=' . l:tmp_root_dir
+                \                            . ':' . b:livepreview_buf_data['root_dir']
+                \                            . ': ' .
+                \       'makeglossaries -d '. l:tmp_root_dir.' '. fnamemodify(l:root_file, ':t').
+                \ ' && ' .
+                \       b:livepreview_buf_data['run_cmd']
+
+        call system(b:livepreview_buf_data['run_cmd_gls'])
+    
+    if v:shell_error != 0
+        echom 'Failed to compile glossaries'
+        lcd -
+        return
+    endif
+
     " Enable compilation of bibliography:
     let l:bib_files = split(glob(b:livepreview_buf_data['root_dir'] . '/**/*.bib'))     " TODO: fails if unused bibfiles
     if len(l:bib_files) > 0

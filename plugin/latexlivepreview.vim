@@ -181,7 +181,10 @@ EEOOFF
     "----------------------------------------------------------------
     " Delve into root and look for \makeglossaries
     " This will only work under root file -- not the best soln...
-    let l:have_glossary = search('\makeglossaries')
+    "let l:have_glossary = search('\makeglossaries')
+    let l:search_glossary_cmd = 'cat '.l:root_file.' | grep'.' makeglossaries'
+    call system(l:search_glossary_cmd)
+    let l:have_glossary = !v:shell_error
 
     if l:have_glossary
 
@@ -207,7 +210,9 @@ EEOOFF
     else
         echom 'Glossaries do not exist and therefore not compiled'
     endif
+
         
+
 
     " Enable compilation of bibliography:
     let l:bib_files = split(glob(b:livepreview_buf_data['root_dir'] . '/**/*.bib'))     " TODO: fails if unused bibfiles

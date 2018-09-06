@@ -180,9 +180,11 @@ EEOOFF
     " Enable compilation of glossary:
     "----------------------------------------------------------------
     " Delve into root and look for \makeglossaries
+    " This will only work under root file -- not the best soln...
     let l:have_glossary = search('\makeglossaries')
 
     if l:have_glossary
+
         " Update compile command with glossaries
         let b:livepreview_buf_data['run_cmd_gls'] =
                 \       'env ' .
@@ -195,22 +197,15 @@ EEOOFF
                 \       b:livepreview_buf_data['run_cmd']
 
         call system(b:livepreview_buf_data['run_cmd_gls'])
-<<<<<<< HEAD
         
         if v:shell_error != 0
             echom 'Glossaries exist but failed to compile'
             lcd -
             return
         endif
+
     else
         echom 'Glossaries do not exist and therefore not compiled'
-=======
-    
-    if v:shell_error != 0
-        echom 'Failed to compile glossaries'
-        lcd -
-        "return
->>>>>>> 047b648471fd4528df3052c239644dc3097fd6e6
     endif
         
 

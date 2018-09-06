@@ -176,8 +176,14 @@ EEOOFF
         return
     endif
 
+    "----------------------------------------------------------------
     " Enable compilation of glossary:
-       " Update compile command with glossaries
+    "----------------------------------------------------------------
+    " Delve into root and look for \makeglossaries
+    let l:have_glossary = search('\makeglossaries')
+
+    if l:have_glossary
+        " Update compile command with glossaries
         let b:livepreview_buf_data['run_cmd_gls'] =
                 \       'env ' .
                 \               'TEXMFOUTPUT=' . l:tmp_root_dir . ' ' .
@@ -187,15 +193,18 @@ EEOOFF
                 \       'makeglossaries -d '. l:tmp_root_dir.' '. fnamemodify(l:root_file, ':t:r').
                 \ ' && ' .
                 \       b:livepreview_buf_data['run_cmd']
-        
 
         call system(b:livepreview_buf_data['run_cmd_gls'])
-    
-    if v:shell_error != 0
-        echom 'Failed to compile glossaries'
-        lcd -
-        return
+        
+        if v:shell_error != 0
+            echom 'Glossaries exist but failed to compile'
+            lcd -
+            return
+        endif
+    else
+        echom 'Glossaries do not exist and therefore not compiled'
     endif
+        
 
     " Enable compilation of bibliography:
     let l:bib_files = split(glob(b:livepreview_buf_data['root_dir'] . '/**/*.bib'))     " TODO: fails if unused bibfiles

@@ -194,7 +194,7 @@ EEOOFF
     if v:shell_error != 0
         echom 'Failed to compile glossaries'
         lcd -
-        return
+        "return
     endif
 
     " Enable compilation of bibliography:

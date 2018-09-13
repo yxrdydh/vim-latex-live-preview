@@ -224,7 +224,7 @@ EEOOFF
         endfor
 
         " Update compile command with bibliography
-        let b:livepreview_buf_data['run_cmd'] =
+        let b:livepreview_buf_data['run_cmd_bib'] =
                 \       'env ' .
                 \               'TEXMFOUTPUT=' . l:tmp_root_dir . ' ' .
                 \               'TEXINPUTS=' . l:tmp_root_dir
@@ -234,7 +234,7 @@ EEOOFF
                 \ ' && ' .
                 \       b:livepreview_buf_data['run_cmd']
 
-        silent call system(b:livepreview_buf_data['run_cmd'])
+        silent call system(b:livepreview_buf_data['run_cmd_bib'])
     endif
     if v:shell_error != 0
         echo 'Failed to compile bibliography'

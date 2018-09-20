@@ -206,9 +206,6 @@ EEOOFF
             lcd -
             return
         endif
-
-    else
-        echom 'Glossaries do not exist and therefore not compiled'
     endif
 
         
@@ -235,11 +232,12 @@ EEOOFF
                 \       b:livepreview_buf_data['run_cmd']
 
         silent call system(b:livepreview_buf_data['run_cmd_bib'])
-    endif
+    
     if v:shell_error != 0
         echo 'Failed to compile bibliography'
         lcd -
         return
+    endif
     endif
 
     call s:RunInBackground(s:previewer . ' ' . l:tmp_out_file)

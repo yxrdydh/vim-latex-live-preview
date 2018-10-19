@@ -213,32 +213,46 @@ EEOOFF
 
     " Enable compilation of bibliography:
     let l:bib_files = split(glob(b:livepreview_buf_data['root_dir'] . '/**/*.bib'))     " TODO: fails if unused bibfiles
+    let l:root_file_dir = b:livepreview_buf_data['root_dir'].'/' "root file dir with additional slash
+
     if len(l:bib_files) > 0
         for bib_file in l:bib_files
             let bib_fn = fnamemodify(bib_file, ':t')
+
+            "if bib files are in different directories
+            "copy the directory structure to tmp folder
+            let bib_file_dir = substitute(bib_file, l:root_file_dir, '', '')
+            let bib_file_dir = substitute(bib_file_dir, bib_fn, '', '')
+            let l:tmp_bib_dir = l:tmp_root_dir.'/'.bib_file_dir
+            if !isdirectory(l:tmp_bib_dir)
+                call mkdir( l:tmp_bib_dir, 'p')
+                "echom 'success in creating dir'.l:tmp_bib_dir
+            endif
+            "mirror bib file contents to tmp folder
             call writefile(readfile(bib_file),
-                        \ l:tmp_root_dir . '/' . bib_fn)                                " TODO: may fail if same bibfile names in different dirs
-        endfor
+                        \ l:tmp_root_dir . '/' . bib_file_dir . bib_fn)
 
-        " Update compile command with bibliography
-        let b:livepreview_buf_data['run_cmd_bib'] =
-                \       'env ' .
-                \               'TEXMFOUTPUT=' . l:tmp_root_dir . ' ' .
-                \               'TEXINPUTS=' . l:tmp_root_dir
-                \                            . ':' . b:livepreview_buf_data['root_dir']
-                \                            . ': ' .
-                \       'bibtex ' . l:tmp_root_dir . '/*.aux' .
-                \ ' && ' .
-                \       b:livepreview_buf_data['run_cmd']
+            "for each bib file, compile once
+            "slow, but should work if bib files are in several folders
+            let b:livepreview_buf_data['run_cmd_bib'] =
+                    \       'env ' .
+                    \               'TEXMFOUTPUT=' . l:tmp_root_dir . ' ' .
+                    \               'TEXINPUTS=' . l:tmp_root_dir
+                    \                            . ':' . b:livepreview_buf_data['root_dir']
+                    \                            . ':' . l:tmp_bib_dir .': '.
+                    \       'bibtex ' . l:tmp_root_dir.'/*.aux' .
+                    \ ' && ' .
+                    \       b:livepreview_buf_data['run_cmd']
+            call system(b:livepreview_buf_data['run_cmd_bib'])
 
-        silent call system(b:livepreview_buf_data['run_cmd_bib'])
-    
-    if v:shell_error != 0
-        echo 'Failed to compile bibliography'
-        lcd -
-        return
-    endif
-    endif
+            if v:shell_error != 0
+                echom 'Failed to compile bibliography: '.bib_fn
+                lcd -
+                "even if there is a problem, move on, but warn
+                "return
+            endif
+        endfor "lopp bib_file
+    endif "len(l:bib_files) > 0
 
     call s:RunInBackground(s:previewer . ' ' . l:tmp_out_file)
 

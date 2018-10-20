@@ -246,7 +246,9 @@ EEOOFF
             call system(b:livepreview_buf_data['run_cmd_bib'])
 
             if v:shell_error != 0
-                echom 'Failed to compile bibliography: '.bib_fn
+                echom 'Shell returns nonzero error code when compiling '.bib_fn
+                "if error, execute again in shell for more info
+                execute "!".b:livepreview_buf_data['run_cmd_bib']
                 lcd -
                 "even if there is a problem, move on, but warn
                 "return
